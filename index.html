@@ -1,0 +1,82 @@
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js">
+</script>
+  </head>
+
+  <body>
+
+     <svg width="1000" height="1000">
+     </svg>
+
+     <script>
+       var drawing = [
+         {id: 1, x1: 20, y1: 20, x2: 100, y2: 100, color: '#ff0000'},
+         {id: 2, x1: 420, y1: 220, x2: 500, y2: 400, color: '#00ff00'}
+       ];
+
+       var Rectangle = Backbone.Model.extend({});
+     
+       var Rectangles = Backbone.Collection.extend({
+         model: Rectangle
+       });
+ 
+       var rectangles = new Rectangles(drawing);
+
+       var Scene  = Backbone.View.extend({
+
+         events: {
+           'click rect': 'handleClick'
+         },
+
+         handleClick: function(ev) {
+          
+           var id = $(ev.currentTarget).attr('id');
+           var rect = this.collection.get(id);
+           rect.set('color', getRandomColor());
+         },
+
+         render: function() {
+           var el = this.$el;
+           this.collection.each(function(model) {
+             var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+             rect.setAttribute('x', model.get('x1'));
+             rect.setAttribute('y', model.get('y1'));
+             rect.setAttribute('width',  '200'); 
+             rect.setAttribute('height',  '400');
+             rect.setAttribute('style', 'fill:' + model.get('color') + ';stroke:pink');
+             rect.id = model.get('id');
+             el.append(rect);
+           });
+           return el;
+         },
+
+        initialize: function() {
+          this.listenTo(this.collection, 'change:color', this.render);
+        }
+
+       })     
+
+      var scene;
+      $(document).ready(function() {
+        scene = new Scene({el: $('svg'), collection: rectangles });
+        scene.render();
+      });
+     
+      function getRandomColor() {
+          var letters = '0123456789ABCDEF'.split('');
+          var color = '#';
+          for (var i = 0; i < 6; i++ ) {
+              color += letters[Math.floor(Math.random() * 16)];
+          }
+          return color;
+      }
+
+     </script>
+  </body>
+
+</html>
