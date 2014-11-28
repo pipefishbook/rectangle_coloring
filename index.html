@@ -15,8 +15,8 @@
 
      <script>
        var drawing = [
-         {id: 1, x1: 20, y1: 20, x2: 100, y2: 100, color: '#ff0000'},
-         {id: 2, x1: 420, y1: 220, x2: 500, y2: 400, color: '#00ff00'}
+         {id: 1, x1: 20, y1: 20, x2: 100, y2: 400, color: '#ff0000'},
+         {id: 2, x1: 120, y1: 220, x2: 500, y2: 400, color: '#00ff00'}
        ];
 
        var Rectangle = Backbone.Model.extend({});
@@ -34,7 +34,6 @@
          },
 
          handleClick: function(ev) {
-          
            var id = $(ev.currentTarget).attr('id');
            var rect = this.collection.get(id);
            rect.set('color', getRandomColor());
@@ -42,12 +41,13 @@
 
          render: function() {
            var el = this.$el;
+           el.empty();
            this.collection.each(function(model) {
              var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
              rect.setAttribute('x', model.get('x1'));
              rect.setAttribute('y', model.get('y1'));
-             rect.setAttribute('width',  '200'); 
-             rect.setAttribute('height',  '400');
+             rect.setAttribute('width',  model.get('x2') - model.get('x1')); 
+             rect.setAttribute('height', model.get('y2') - model.get('y1')); 
              rect.setAttribute('style', 'fill:' + model.get('color') + ';stroke:pink');
              rect.id = model.get('id');
              el.append(rect);
