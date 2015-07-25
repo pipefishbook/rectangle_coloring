@@ -1,0 +1,77 @@
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js"></script>
+    <script src="https://cdn.rawgit.com/jashkenas/coffeescript/master/extras/coffee-script.js"></script>
+  </head>
+
+  <body>
+
+     <svg width="1000" height="1000"></svg>
+
+<script type="text/coffeescript">
+drawing = [
+  { id: 1, x1: 20, y1: 20, x2: 100, y2: 400, color: '#ff0000'}
+  { id: 2, x1: 120, y1: 220, x2: 500, y2: 400, color: '#00ff00'}
+]
+
+Rectangle  = Backbone.Model.extend {}
+Rectangles = Backbone.Collection.extend model: Rectangle
+rectangles = new Rectangles drawing
+
+Scene  = Backbone.View.extend(
+
+   events: 
+     'click rect': 'handleClick'
+
+   handleClick: (ev)->
+     id = $(ev.currentTarget).attr 'id'
+     rect = @collection.get id 
+     rect.set 'color', getRandomColor()
+
+   initialize: ->
+     @listenTo @collection, 'change:color', @render 
+
+   render: ->
+     el = @$el
+     el.empty()
+
+     @collection.each( (model)->
+
+       rect = document.createElementNS "http://www.w3.org/2000/svg", "rect"
+       rect.setAttribute 'x', model.get('x1')
+       rect.setAttribute 'y', model.get('y1')
+       rect.setAttribute 'width',  model.get('x2') - model.get('x1') 
+       rect.setAttribute 'height', model.get('y2') - model.get('y1') 
+       rect.setAttribute 'style', 'fill:' + model.get('color') + ';stroke:pink'
+       rect.id = model.get 'id'
+       el.append rect
+
+     )
+
+     el
+
+ )     
+
+$(document).ready(->
+  scene = new Scene el: $('svg'), collection: rectangles 
+  scene.render()
+)
+
+getRandomColor = ->
+    letters = '0123456789ABCDEF'.split ''
+    color   = '#'
+
+    i = 0
+    while i < 6
+      color += letters[Math.floor(Math.random() * 16)]
+      i++
+    color
+
+</script>
+
+
+  </body>
+
+</html>
